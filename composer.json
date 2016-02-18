@@ -2,7 +2,7 @@
   "name": "misszero/passportsdkphp",
   "autoload": {
     "psr-4": {
-      "Rice\\Passport\\": "src/"
+      "Passport\\": "src/"
     }
   }
 }

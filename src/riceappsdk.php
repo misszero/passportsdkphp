@@ -1,6 +1,6 @@
 <?php
 
-namespace Rice\Passport;
+namespace Passport;
 
 include_once('HttpClient.class.php');
 include_once('Mobile_Detect.php');
