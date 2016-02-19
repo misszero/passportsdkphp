@@ -40,13 +40,13 @@ class RiceAppSDK
 
     static function CreateSDK($appkey, $clienttype = 0, $accessmode = 1, $adduserbyweixinunlogin = 0, $sitename = "")
     {
-        if(isset($appkey) || $appkey == "")
+        if(!isset($appkey) || $appkey == "")
         {
             echo "必须设置AppKey，否则无法使用Passport。";
             die;
         }
 
-        return RiceAppSDK::Create(RiceAppSDKConfig::$PassportDomain, RiceAppSDKConfig::$WeixinOauth, RiceAppSDKConfig::$WeixinAppid, RiceAppSDKConfig::$WeixinSecret, RiceAppSDKConfig::$RootDomain,
+        return RiceAppSDK::Create(\RiceAppSDKConfig::$PassportDomain, \RiceAppSDKConfig::$WeixinOauth, \RiceAppSDKConfig::$WeixinAppid, \RiceAppSDKConfig::$WeixinSecret, \RiceAppSDKConfig::$RootDomain,
             $appkey, $clienttype, $accessmode, $adduserbyweixinunlogin, $sitename);
     }
 
@@ -68,6 +68,8 @@ class RiceAppSDK
         $addUserByWeixinUnlogin = $adduserbyweixinunlogin;
         $siteName = $sitename;
 
+        \Util::SetConfigs($accessMode, $rootDomain);
+
         $sdk = new RiceAppSDK();
 
         $sdk->CurrentUrl = "http://".$_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI'];
@@ -81,7 +83,7 @@ class RiceAppSDK
         {
             if($clienTtype == "0")
             {
-                $detect = new Mobile_Detect();
+                $detect = new \Mobile_Detect();
                 $sdk->ClientType = ($detect->isMobile() ? "2" : "1");
             }
             else
@@ -180,12 +182,12 @@ class RiceAppSDK
                     $redirecturi = $_SERVER['REQUEST_URI'];
                     $weixinunionid = $this->GetWeixinUnionID();
                     if ($weixinunionid == "" || $weixinunionid != $userinfo->WeixinUnionID) {
-                        Util::Logout();
+                        \Util::Logout();
                         $this->GotoWeixinAuth($redirecturi);
                     }
                 }
             }
-            Util::Login($userinfo);
+            \Util::Login($userinfo);
         }
         else if($this->IsInApp() && $this->AppIsLogin())
         {
@@ -193,10 +195,10 @@ class RiceAppSDK
             $m_userid = $this->UserID;
             $url = $this->checkloginUri;
             $params = array('ak'=>$m_appkey, 'uid'=>$m_userid);
-            $result = json_decode(HttpClient::quickPost($url, $params));
+            $result = json_decode(\HttpClient::quickPost($url, $params));
             $result_openid = $result->openid;
 
-            Util::Login($this->GetUserInfo($result_openid));
+            \Util::Login($this->GetUserInfo($result_openid));
         }
         else if($this->IsInWeixin() && $this->IsBindingWeixin() != "unbind")
         {
@@ -219,7 +221,7 @@ class RiceAppSDK
         }
         else
         {
-            Util::Logout();
+            \Util::Logout();
         }
 
     }
@@ -308,7 +310,7 @@ class RiceAppSDK
 
         $url = $this->checkneedpermissionsuri;
         $params = array('serviceurl'=>$serviceurl);
-        $str = HttpClient::quickPost($url, $params);
+        $str = \HttpClient::quickPost($url, $params);
 
         $ajax_str = json_decode($str);
 
@@ -328,7 +330,7 @@ class RiceAppSDK
     {
         $url = $this->checkpermissionsuri;
         $params = array('userid'=>$userid, 'storeid'=>$storeid, 'serviceurl'=>$serviceurl);
-        $str = HttpClient::quickPost($url, $params);
+        $str = \HttpClient::quickPost($url, $params);
 
         $ajax_obj = json_decode(trim($str,chr(239).chr(187).chr(191)));
         $result = $ajax_obj->data->result;
@@ -405,13 +407,13 @@ class RiceAppSDK
     public function SetStoreID($storeid)
     {
         $cookie_timeout = 3600*24*30;
-        Util::SetCookies("rice_passport_storeid", $storeid, $cookie_timeout);
+        \Util::SetCookies("rice_passport_storeid", $storeid, $cookie_timeout);
     }
 
     public function ClearStoreID()
     {
         $cookie_timeout = 3600;
-        Util::SetCookies("rice_passport_storeid", "", $cookie_timeout);
+        \Util::SetCookies("rice_passport_storeid", "", $cookie_timeout);
     }
 
     public function GetStore()
@@ -422,7 +424,7 @@ class RiceAppSDK
         {
             $url = $this->getstoreuri;
             $params = array('id'=>$storeid);
-            $str = HttpClient::quickPost($url, $params);
+            $str = \HttpClient::quickPost($url, $params);
             $ajax_str = json_decode(trim($str,chr(239).chr(187).chr(191)));
             $result = $ajax_str->data->result;
         }
@@ -436,7 +438,7 @@ class RiceAppSDK
         $storeid = $this->GetStoreID();
         $url = $this->authorizetouser;
         $params = array('userid'=>$userid, 'storeid'=>$storeid, 'rolecode'=>$rolecode);
-        $str = HttpClient::quickPost($url, $params);
+        $str = \HttpClient::quickPost($url, $params);
 
         $ajax_str = json_decode($str);
 
@@ -533,7 +535,7 @@ class RiceAppSDK
     {
         $url = $this->getuserinfoUri;
         $params = array('op'=>$openid);
-        $entites = HttpClient::quickPost($url, $params);
+        $entites = \HttpClient::quickPost($url, $params);
 
         return json_decode(trim($entites,chr(239).chr(187).chr(191)));
     }
@@ -636,7 +638,7 @@ class RiceAppSDK
     //注销登陆用户
     public function Logout()
     {
-        Util::Logout();
+        \Util::Logout();
     }
 
     /*
@@ -723,7 +725,7 @@ class RiceAppSDK
     {
         $url = $this->adduserUri;
         $params = array('ph'=>$phone);
-        $result = json_decode(HttpClient::quickPost($url, $params));
+        $result = json_decode(\HttpClient::quickPost($url, $params));
         return $result;
     }
 
@@ -763,7 +765,7 @@ class RiceAppSDK
     {
         $url = $this->getstoreservicesuri;
         $params = array('op'=>$openid);
-        $str = HttpClient::quickPost($url, $params);
+        $str = \HttpClient::quickPost($url, $params);
         $ajax_obj = json_decode(trim($str,chr(239).chr(187).chr(191)));
         $result = $ajax_obj->data->result;
         return $result;
@@ -773,7 +775,7 @@ class RiceAppSDK
     {
         $url = $this->getservicebyurluri;
         $params = array('serviceurl'=>$serviceurl);
-        $str = HttpClient::quickPost($url, $params);
+        $str = \HttpClient::quickPost($url, $params);
         $ajax_obj = json_decode(trim($str,chr(239).chr(187).chr(191)));
         $result = $ajax_obj->data;
         return $result;
@@ -786,7 +788,7 @@ class RiceAppSDK
         $openid = $this->GetOpenID();
 
         $params = array('serviceurl'=>$serviceurl, 'op'=>$openid);
-        $str = HttpClient::quickPost($url, $params);
+        $str = \HttpClient::quickPost($url, $params);
         $ajax_obj = json_decode(trim($str,chr(239).chr(187).chr(191)));
         $result = $ajax_obj->data;
         return $result;
@@ -798,7 +800,7 @@ class RiceAppSDK
         $openid = $this->GetOpenID();
 
         $params = array('op'=>$openid, 'mobile'=>$mobile);
-        $str = HttpClient::quickPost($url, $params);
+        $str = \HttpClient::quickPost($url, $params);
         $json_obj = json_decode(trim($str,chr(239).chr(187).chr(191)));
 
         $code = $json_obj->code;

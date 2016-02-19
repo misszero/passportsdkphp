@@ -1,4 +1,5 @@
 ﻿<?php
+
 /*
 //$riceappsdk_configs["appkey"] = "3b32610e-f611-11e4-b179-38eaa78c73bb";
 $riceappsdk_configs["passportdomain"] = "http://passport.waitme.mobi:20080"; //passport service的根目录

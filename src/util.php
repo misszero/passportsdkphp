@@ -5,7 +5,7 @@ include_once("config.php");
 
 class Util
 {
-    public static $Configs;
+    //public static $Configs;
     public static $AccessMode;
     public static $RootDomain;
 
@@ -38,11 +38,8 @@ class Util
         Handler::OnLogout();
     }
 
-    static function SetConfigs($mconfigs)
+    static function SetConfigs($accessmode, $rootdomain)
     {
-        self::$Configs = $mconfigs;
-
-        $accessmode = self::$Configs["access_mode"];
         if(empty($accessmode))
         {
            self::$AccessMode = "1";
@@ -52,7 +49,7 @@ class Util
             self::$AccessMode = $accessmode;
         }
 
-        self::$RootDomain = self::$Configs["rootdomain"];
+        self::$RootDomain = $rootdomain;
     }
 
     static function SetCookies($key, $value, $timeout)
@@ -78,6 +75,7 @@ class Util
     }
 }
 
-Util::SetConfigs($riceappsdk_configs);
+//Util::SetConfigs($riceappsdk_configs);
+//Util::SetConfigs($accessmode, $rootdomain);
 
 ?>
